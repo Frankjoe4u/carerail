@@ -21,12 +21,12 @@ export default function Home() {
       <section className="grid items-center gap-14 pb-20 pt-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-14">
         <div>
           <h1 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
-            Pay a Nigerian clinic bill from any chain.
+            Pay any clinic&apos;s bill from any chain.
           </h1>
           <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-muted">
-            A relative abroad pays with the token they already hold. The clinic
-            receives USDC on NEAR for exactly the amount on the bill, with no
-            bank transfer in between.
+            Family or friends far away pay with the token they already hold. The
+            clinic receives USDC on NEAR for exactly the amount on the bill,
+            with no bank transfer in between.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link

@@ -5,9 +5,9 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "Diaspora Health Pay",
+  title: "CareRail",
   description:
-    "Pay a Nigerian clinic bill from any chain. The clinic receives USDC on NEAR, settled with NEAR Intents.",
+    "Pay any clinic's bill from any chain. The clinic receives USDC on NEAR, settled with NEAR Intents.",
 };
 
 export default function RootLayout({

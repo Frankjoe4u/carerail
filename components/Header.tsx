@@ -13,7 +13,7 @@ export function Header() {
           </svg>
         </span>
         <span className="font-display text-lg font-bold tracking-tight">
-          Diaspora Health Pay
+          CareRail
         </span>
       </Link>
       <nav>

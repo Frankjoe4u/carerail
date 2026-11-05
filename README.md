@@ -1,12 +1,12 @@
-# Diaspora Health Pay
+# CareRail
 
-Pay a Nigerian clinic bill from any chain. The payer uses the token they already hold; the clinic receives **USDC on NEAR** for exactly the amount on the bill. Settlement runs through **NEAR Intents**.
+Pay any clinic's bill from any chain. The payer uses the token they already hold; the clinic receives **USDC on NEAR** for exactly the amount on the bill. Settlement runs through **NEAR Intents**.
 
 Built solo for NEAR HACKATHON. Track: **Real-World Money** (invoicing, remittances, stablecoin payments).
 
 ## The problem
 
-Families abroad regularly pay medical bills for relatives in Nigeria. Today that means bank transfers with high fees and slow settlement, or a middleman who converts currency. A clinic wants a fixed amount in a stable currency. The payer wants to use what they already have, on whichever chain they have it.
+People regularly pay medical bills for relatives in another country, for example families abroad paying a clinic back home in Nigeria. Today that means bank transfers with high fees and slow settlement, or a middleman who converts currency. A clinic wants a fixed amount in a stable currency. The payer wants to use what they already have, on whichever chain they have it.
 
 ## What it does
 

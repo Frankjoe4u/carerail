@@ -1,6 +1,6 @@
 import { PayClient } from "@/components/PayClient";
 
-export const metadata = { title: "Pay a bill | Diaspora Health Pay" };
+export const metadata = { title: "Pay a bill | CareRail" };
 
 export default async function PayPage({
   params,
