@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #f2f5f3;
+  --color-ink: #11231e;
+  --color-muted: #566a63;
+  --color-line: #d2dcd7;
+  --color-pine: #0c5a48;
+  --color-pine-deep: #08392e;
+  --color-mint: #d8ebe3;
+  --color-amber: #8f5a0a;
+  --color-amber-soft: #f8ecd0;
+  --color-coral: #a63a27;
+  --color-coral-soft: #f7e0da;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-pine);
+  outline-offset: 2px;
+}
+
+/* The bill: a printed statement with a tear-off line between bill and payment */
+.slip {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+}
+
+.slip-tear {
+  position: relative;
+  border-top: 2px dashed var(--color-line);
+}
+
+.slip-tear::before,
+.slip-tear::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+}
+
+.slip-tear::before {
+  left: -11px;
+  clip-path: inset(0 0 0 50%);
+}
+
+.slip-tear::after {
+  right: -11px;
+  clip-path: inset(0 50% 0 0);
+}
+
+/* The one orchestrated moment: the stamp lands when the bill is paid */
+.stamp {
+  display: inline-block;
+  border: 3px solid var(--color-pine);
+  color: var(--color-pine);
+  border-radius: 6px;
+  padding: 0.15rem 0.9rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+  transform: rotate(-6deg);
+  animation: stamp-land 520ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+@keyframes stamp-land {
+  0% {
+    opacity: 0;
+    transform: rotate(-14deg) scale(1.9);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-6deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp {
+    animation: none;
+  }
+}
