@@ -155,7 +155,7 @@ export default function Home() {
             <span className="grid size-8 place-items-center rounded-full bg-mint text-mintfg">
               <Icon name="globe" className="size-4" />
             </span>
-            Built for the NEAR hackathon, settled with NEAR Intents.
+            Powerered by NEAR Intents.
           </p>
         </div>
 
