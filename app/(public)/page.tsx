@@ -200,7 +200,7 @@ export default function Home() {
                 height={910}
                 priority
                 sizes="(min-width: 1024px) 520px, 100vw"
-                className="absolute inset-0 size-full object-cover"
+                unoptimized className="absolute inset-0 size-full object-cover"
               />
               <PayCard className="absolute bottom-0 right-0 w-[56%] sm:w-[48%]" />
             </div>
@@ -292,7 +292,7 @@ export default function Home() {
                 width={735}
                 height={594}
                 sizes="(min-width: 1024px) 520px, 100vw"
-                className="absolute inset-0 size-full object-cover"
+                unoptimized className="absolute inset-0 size-full object-cover"
               />
             </div>
             <DashboardCard className="mt-4 lg:absolute lg:-bottom-8 lg:-left-12 lg:mt-0 lg:w-[22rem]" />
@@ -343,4 +343,5 @@ export default function Home() {
     </>
   );
 }
+
 
