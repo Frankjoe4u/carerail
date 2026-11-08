@@ -194,7 +194,7 @@ export default function Home() {
           <div className="enter relative" style={{ "--d": "180ms" } as React.CSSProperties}>
             <div className="relative aspect-[1140/910] overflow-hidden rounded-[24px] ring-1 ring-white/15">
               <Image
-                src="/images/hero.webp"
+                src="/images/hero.jpg"
                 alt="A patient smiling at her phone beside a doctor"
                 width={1140}
                 height={910}
@@ -287,7 +287,7 @@ export default function Home() {
           <div className="relative">
             <div className="relative aspect-[735/594] overflow-hidden rounded-[24px] ring-1 ring-white/20">
               <Image
-                src="/images/provider.webp"
+                src="/images/provider.jpg"
                 alt="A doctor with her arms crossed, smiling"
                 width={735}
                 height={594}
@@ -343,5 +343,6 @@ export default function Home() {
     </>
   );
 }
+
 
 
