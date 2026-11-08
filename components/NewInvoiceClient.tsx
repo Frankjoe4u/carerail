@@ -133,7 +133,7 @@ export function NewInvoiceClient() {
     return (
       <div className="pop mx-auto max-w-lg">
         <div className="card relative overflow-hidden p-6 text-center sm:p-8">
-          <span className="success-ring mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#07694a] to-[#0d8559] text-white shadow-[0_14px_30px_-10px_rgba(20,166,115,0.8)]">
+          <span className="success-ring mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#08707a] to-[#0b857a] text-white shadow-[0_14px_30px_-10px_rgba(45,212,191,0.8)]">
             <Icon name="check" className="size-10" />
           </span>
           <h1 className="display mt-5 text-3xl">Invoice created</h1>
@@ -206,7 +206,7 @@ export function NewInvoiceClient() {
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface2">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#07694a] to-[#1fc88b] transition-[width] duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-[#08707a] to-[#2dd4bf] transition-[width] duration-500"
             style={{ width: step === 1 ? "50%" : "100%" }}
           />
         </div>

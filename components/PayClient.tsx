@@ -494,16 +494,16 @@ function Progress({ status }: { status: Invoice["status"] }) {
 }
 
 const CONFETTI = [
-  ["#1fc88b", -150, -90, 200, 0],
+  ["#2dd4bf", -150, -90, 200, 0],
   ["#3fa9ff", -110, -140, -160, 40],
   ["#f5b041", -60, -110, 260, 20],
-  ["#1fc88b", -20, -160, -220, 70],
+  ["#2dd4bf", -20, -160, -220, 70],
   ["#3fa9ff", 30, -120, 180, 10],
   ["#f5b041", 80, -150, -140, 60],
-  ["#1fc88b", 120, -100, 240, 30],
+  ["#2dd4bf", 120, -100, 240, 30],
   ["#3fa9ff", 160, -70, -200, 0],
   ["#f5b041", -130, -30, 150, 90],
-  ["#1fc88b", 140, -20, -170, 50],
+  ["#2dd4bf", 140, -20, -170, 50],
 ] as const;
 
 function PaidView({ invoice }: { invoice: Invoice }) {
@@ -530,7 +530,7 @@ function PaidView({ invoice }: { invoice: Invoice }) {
           />
         ))}
       </div>
-      <span className="success-ring mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#07694a] to-[#0d8559] text-white shadow-[0_14px_30px_-10px_rgba(20,166,115,0.8)]">
+      <span className="success-ring mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#08707a] to-[#0b857a] text-white shadow-[0_14px_30px_-10px_rgba(45,212,191,0.8)]">
         <Icon name="check" className="size-10" />
       </span>
       <h1 className="display mt-5 text-3xl">Payment successful</h1>

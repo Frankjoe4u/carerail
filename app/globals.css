@@ -8,19 +8,19 @@
 :root,
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #06110f;
-  --glow: rgba(20, 166, 115, 0.2);
-  --glow2: rgba(60, 120, 255, 0.1);
-  --surface: #0e211d;
-  --surface2: #132b26;
-  --fg: #e9f4f0;
-  --muted: #93aaa3;
+  --bg: #060f1d;
+  --glow: rgba(45, 212, 191, 0.16);
+  --glow2: rgba(60, 120, 255, 0.14);
+  --surface: #0c1a2e;
+  --surface2: #12233b;
+  --fg: #e8f1fb;
+  --muted: #94aac6;
   --line: rgba(255, 255, 255, 0.1);
-  --primary: #1fc88b;
-  --mint: rgba(31, 200, 139, 0.14);
-  --mintfg: #5be0a8;
-  --ok-bg: rgba(31, 200, 139, 0.16);
-  --ok-fg: #5be0a8;
+  --primary: #2dd4bf;
+  --mint: rgba(45, 212, 191, 0.14);
+  --mintfg: #5eead4;
+  --ok-bg: rgba(52, 211, 153, 0.16);
+  --ok-fg: #6ee7b7;
   --warn-bg: rgba(245, 176, 65, 0.16);
   --warn-fg: #f3c366;
   --bad-bg: rgba(255, 107, 95, 0.16);
@@ -28,22 +28,23 @@
   --info-bg: rgba(86, 170, 255, 0.16);
   --info-fg: #86c2ff;
   --shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.8);
-  --side: #08181a;
+  --side: #07152a;
+  --navy: #0a2a5e;
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #eef6f3;
-  --glow: rgba(20, 166, 115, 0.2);
+  --bg: #f2f7fc;
+  --glow: rgba(45, 212, 191, 0.22);
   --glow2: rgba(60, 130, 255, 0.14);
   --surface: #ffffff;
-  --surface2: #f2f8f5;
-  --fg: #0b1f1a;
-  --muted: #55706a;
-  --line: rgba(11, 31, 26, 0.12);
-  --primary: #0b7a55;
-  --mint: #dcf3e9;
-  --mintfg: #05613f;
+  --surface2: #eef5fb;
+  --fg: #0b1f4d;
+  --muted: #4a5f80;
+  --line: rgba(11, 31, 77, 0.12);
+  --primary: #0a7a80;
+  --mint: #d8f3f1;
+  --mintfg: #08645f;
   --ok-bg: #d9f3e6;
   --ok-fg: #05613f;
   --warn-bg: #fdf0cf;
@@ -52,8 +53,9 @@
   --bad-fg: #a8261e;
   --info-bg: #dff0ff;
   --info-fg: #0a5aa0;
-  --shadow: 0 18px 40px -22px rgba(11, 70, 52, 0.35);
-  --side: #0a2a25;
+  --shadow: 0 18px 40px -22px rgba(11, 50, 100, 0.35);
+  --side: #0a2250;
+  --navy: #0a2a5e;
 }
 
 @theme inline {
@@ -78,6 +80,7 @@
   --color-info-bg: var(--info-bg);
   --color-info-fg: var(--info-fg);
   --color-side: var(--side);
+  --color-navy: var(--navy);
 }
 
 html {
@@ -126,13 +129,13 @@ body::before {
 }
 
 .grad-text {
-  background: linear-gradient(100deg, #1fc88b, #3fa9ff);
+  background: linear-gradient(100deg, #2dd4bf, #3fa9ff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 :root[data-theme="light"] .grad-text {
-  background-image: linear-gradient(100deg, #07694a, #0b7ab8);
+  background-image: linear-gradient(100deg, #0a7a80, #0b5fb8);
 }
 
 @layer components {
@@ -176,9 +179,9 @@ body::before {
 }
 .btn-primary {
   color: #fff;
-  background: linear-gradient(135deg, #07694a, #0d8559);
+  background: linear-gradient(135deg, #08707a, #0b857a);
   box-shadow:
-    0 10px 24px -10px rgba(20, 166, 115, 0.8),
+    0 10px 24px -10px rgba(45, 212, 191, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 .btn-primary:hover:not(:disabled) {
@@ -215,7 +218,7 @@ body::before {
 }
 .field:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(20, 166, 115, 0.22);
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.22);
 }
 
 .chip {
@@ -241,7 +244,7 @@ body::before {
   color: var(--fg);
 }
 .chip[aria-pressed="true"] {
-  background: linear-gradient(135deg, #07694a, #0d8559);
+  background: linear-gradient(135deg, #08707a, #0b857a);
   border-color: transparent;
   color: #fff;
 }
@@ -453,5 +456,29 @@ body::before {
   }
   .confetti {
     display: none;
+  }
+}
+
+/* Photo slots: the image sits over a gradient, so a missing file still looks designed */
+.photo-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28%), linear-gradient(to top, transparent, #000 22%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 28%), linear-gradient(to top, transparent, #000 22%);
+  mask-composite: intersect;
+}
+.photo-fade-left {
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 30%), linear-gradient(to top, transparent, #000 10%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to left, transparent, #000 30%), linear-gradient(to top, transparent, #000 10%);
+  mask-composite: intersect;
+}
+.ecg {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: draw 2.4s ease-out 300ms forwards;
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
   }
 }

@@ -5,7 +5,7 @@ export function LogoMark({ className = "size-9" }: { className?: string }) {
     <span
       aria-hidden
       className={`grid shrink-0 place-items-center rounded-xl text-white ${className}`}
-      style={{ background: "linear-gradient(135deg, #07694a, #17b17c)" }}
+      style={{ background: "linear-gradient(135deg, #08707a, #2dd4bf)" }}
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="size-[62%]">
         <path d="M12 21s-8-5.2-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.8-8 11-8 11z" />

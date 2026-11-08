@@ -34,7 +34,7 @@ export function ClinicShell({ children }: { children: React.ReactNode }) {
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-12 items-center gap-3 rounded-xl px-3.5 font-semibold transition-colors ${
                   active
-                    ? "bg-gradient-to-r from-[#0a7a55] to-[#0d8559] text-white shadow-[0_8px_20px_-10px_rgba(20,200,139,0.9)]"
+                    ? "bg-gradient-to-r from-[#08707a] to-[#0b857a] text-white shadow-[0_8px_20px_-10px_rgba(20,200,139,0.9)]"
                     : "text-white/70 hover:bg-white/8 hover:text-white"
                 }`}
               >
@@ -83,7 +83,7 @@ export function ClinicShell({ children }: { children: React.ReactNode }) {
               }`}
             >
               {create ? (
-                <span className="-mt-6 grid size-12 place-items-center rounded-full bg-gradient-to-br from-[#07694a] to-[#0d8559] text-white shadow-[0_10px_20px_-6px_rgba(20,166,115,0.8)]">
+                <span className="-mt-6 grid size-12 place-items-center rounded-full bg-gradient-to-br from-[#08707a] to-[#0b857a] text-white shadow-[0_10px_20px_-6px_rgba(45,212,191,0.8)]">
                   <Icon name="plus" className="size-6" />
                 </span>
               ) : (
