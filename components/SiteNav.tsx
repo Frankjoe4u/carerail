@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "./Icons";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/#how", label: "How it works" },
+  { href: "/pay", label: "For patients" },
   { href: "/clinic", label: "For clinics" },
-  { href: "/#faqs", label: "FAQs" },
+  { href: "/#how", label: "How it works" },
+  { href: "/#faqs", label: "FAQ" },
 ];
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
+  const path = usePathname();
 
   return (
     <header className="relative z-30 mx-auto w-full max-w-6xl px-4 py-3 sm:px-8 sm:py-5">
@@ -22,12 +24,12 @@ export function SiteNav() {
         <Logo />
 
         <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
-          {LINKS.map((l, i) => (
+          {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               className={`inline-flex min-h-11 items-center border-b-2 text-sm font-semibold transition-colors hover:text-primary ${
-                i === 0 ? "border-primary text-fg" : "border-transparent text-muted"
+                l.href === path ? "border-primary text-fg" : "border-transparent text-muted"
               }`}
             >
               {l.label}

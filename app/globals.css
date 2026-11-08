@@ -482,3 +482,21 @@ body::before {
     stroke-dashoffset: 0;
   }
 }
+
+/* Home hero panel: navy in dark mode, soft mint-white in light mode */
+.hero-panel {
+  background:
+    radial-gradient(60% 80% at 85% 20%, rgba(45, 212, 191, 0.16), transparent 70%),
+    linear-gradient(135deg, #07142a 0%, #0a1f3d 100%);
+  color: #e8f1fb;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+[data-theme="light"] .hero-panel {
+  background:
+    radial-gradient(60% 80% at 85% 20%, rgba(10, 122, 128, 0.14), transparent 70%),
+    linear-gradient(135deg, #ffffff 0%, #e6f4f3 100%);
+  color: #0b1f4d;
+  border: 1px solid rgba(10, 34, 80, 0.08);
+}
+.hero-panel .hp-muted { color: rgba(232, 241, 251, 0.78); }
+[data-theme="light"] .hero-panel .hp-muted { color: #4a5f80; }
