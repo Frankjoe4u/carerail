@@ -17,6 +17,10 @@ export function usdcToSmallestUnit(value: string): string {
   return (BigInt(whole) * 1_000_000n + BigInt(padded)).toString();
 }
 
+export function isValidEvmAddress(value: string): boolean {
+  return /^0x[0-9a-fA-F]{40}$/.test(value);
+}
+
 export function isValidRefundAddress(value: string): boolean {
   return value.length >= 10 && value.length <= 120 && !/\s/.test(value);
 }

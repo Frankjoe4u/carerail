@@ -9,6 +9,8 @@ import {
 } from "react";
 import type { Invoice, PayToken } from "@/lib/types";
 import { CopyButton } from "./CopyButton";
+import { Icon } from "./Icons";
+import { LogoMark } from "./Logo";
 import { StatusBadge } from "./StatusBadge";
 
 const CHAIN_NAMES: Record<string, string> = {
@@ -20,8 +22,27 @@ const CHAIN_NAMES: Record<string, string> = {
   btc: "Bitcoin",
 };
 
-const INPUT =
-  "mt-1.5 w-full rounded-lg border border-line bg-white px-3.5 py-2.5 font-mono text-sm leading-6 outline-none placeholder:text-muted/60 focus:border-pine";
+const TOKEN_COLORS: Record<string, string> = {
+  USDC: "#2775ca",
+  USDT: "#26a17b",
+  ETH: "#627eea",
+  NEAR: "#111111",
+  wNEAR: "#111111",
+  BTC: "#f7931a",
+  SOL: "#7c3aed",
+};
+
+function TokenIcon({ symbol }: { symbol: string }) {
+  return (
+    <span
+      aria-hidden
+      className="grid size-10 shrink-0 place-items-center rounded-full text-[11px] font-extrabold text-white"
+      style={{ background: TOKEN_COLORS[symbol] ?? "#475569" }}
+    >
+      {symbol.length > 4 ? symbol.slice(0, 2) : symbol}
+    </span>
+  );
+}
 
 function chainName(chain: string) {
   return CHAIN_NAMES[chain] ?? chain;
@@ -158,9 +179,12 @@ export function PayClient({ id }: { id: string }) {
 
   if (notFound) {
     return (
-      <section className="pt-10">
-        <h1 className="font-display text-3xl font-extrabold">Invoice not found</h1>
-        <p className="mt-3 max-w-md text-muted">
+      <section className="mx-auto max-w-md pt-12 text-center">
+        <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-bad-bg text-bad-fg">
+          <Icon name="alert" className="size-8" />
+        </span>
+        <h1 className="display mt-5 text-3xl">Invoice not found</h1>
+        <p className="mt-2 text-muted">
           This link does not match an invoice. Ask the clinic to send the link
           again.
         </p>
@@ -170,157 +194,190 @@ export function PayClient({ id }: { id: string }) {
 
   if (!invoice) {
     return (
-      <section className="pt-10 text-muted">
-        {loadError || "Loading invoice..."}
+      <section className="mx-auto max-w-lg pt-6" aria-busy="true">
+        {loadError ? (
+          <p role="alert" className="rounded-xl bg-bad-bg px-4 py-3 text-bad-fg">{loadError}</p>
+        ) : (
+          <div className="space-y-4">
+            <div className="sheen h-56 rounded-3xl" />
+            <div className="sheen h-72 rounded-3xl" />
+          </div>
+        )}
       </section>
     );
   }
 
   const quote = invoice.quote;
   const selected = tokens.find((t) => t.assetId === assetId);
-  const canPay = invoice.status === "awaiting_payment" || invoice.status === "failed" || invoice.status === "refunded";
+  const canPay =
+    invoice.status === "awaiting_payment" ||
+    invoice.status === "failed" ||
+    invoice.status === "refunded";
+  const showQuote =
+    quote && (invoice.status === "awaiting_payment" || invoice.status === "processing");
+
+  if (invoice.status === "paid") {
+    return (
+      <div className="mx-auto max-w-lg pt-4">
+        {demo && <DemoNote />}
+        <PaidView invoice={invoice} />
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-xl pt-4">
-      {demo && (
-        <p className="mb-4 rounded-lg bg-amber-soft px-3.5 py-2.5 text-sm text-amber">
-          Demo mode: no real money moves. Use the simulate button to see the
-          full flow.
-        </p>
-      )}
+    <div className="mx-auto max-w-lg pt-4">
+      {demo && <DemoNote />}
       {loadError && (
-        <p role="alert" className="mb-4 rounded-lg bg-coral-soft px-3.5 py-2.5 text-sm text-coral">
+        <p role="alert" className="mb-4 rounded-xl bg-bad-bg px-4 py-3 text-sm text-bad-fg">
           {loadError}
         </p>
       )}
 
-      <article className="slip shadow-[0_18px_40px_-24px_rgba(12,90,72,0.45)]">
-        <div className="p-6 sm:p-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm text-muted">Bill from</p>
-              <h1 className="font-display text-2xl font-extrabold tracking-tight">
-                {invoice.clinicName}
-              </h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="display text-3xl">Bill summary</h1>
+        <StatusBadge status={invoice.status} />
+      </div>
+
+      <article className="card mt-4 p-5 sm:p-6">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <LogoMark className="size-11" />
+            <div className="min-w-0">
+              <p className="text-xs text-muted">Bill from</p>
+              <p className="display truncate text-xl">{invoice.clinicName}</p>
             </div>
-            <StatusBadge status={invoice.status} />
           </div>
-          <p className="mt-6 text-sm text-muted">{invoice.patientName}</p>
-          <p>{invoice.description}</p>
-          <p className="mt-5 font-display text-5xl font-extrabold tracking-tight">
-            {invoice.amountUsdc}{" "}
-            <span className="text-2xl font-bold text-muted">USDC</span>
-          </p>
         </div>
-
-        <div className="slip-tear p-6 sm:p-8">
-          {invoice.status === "paid" ? (
-            <PaidView invoice={invoice} />
-          ) : quote && (invoice.status === "awaiting_payment" || invoice.status === "processing") ? (
-            <QuoteView
-              invoice={invoice}
-              now={now}
-              demo={demo && quote.mock}
-              busy={busy}
-              onSimulate={simulatePayment}
-            />
-          ) : canPay ? (
-            <form onSubmit={requestQuote} className="space-y-6">
-              {(invoice.status === "failed" || invoice.status === "refunded") && (
-                <p role="alert" className="rounded-lg bg-coral-soft px-3.5 py-2.5 text-sm text-coral">
-                  {invoice.status === "refunded"
-                    ? "The last payment did not complete and was refunded to the paying wallet. You can try again."
-                    : "The last payment failed. You can try again."}
-                </p>
-              )}
-              {notice && (
-                <p role="status" className="rounded-lg bg-amber-soft px-3.5 py-2.5 text-sm text-amber">
-                  {notice}
-                </p>
-              )}
-
-              <fieldset>
-                <legend className="text-sm font-semibold">
-                  What do you want to pay with?
-                </legend>
-                {tokenError ? (
-                  <p role="alert" className="mt-2 text-sm text-coral">
-                    {tokenError}
-                  </p>
-                ) : tokens.length === 0 ? (
-                  <p className="mt-2 text-sm text-muted">Loading tokens...</p>
-                ) : (
-                  <div role="radiogroup" className="mt-2.5 flex flex-wrap gap-2">
-                    {tokens.map((t) => {
-                      const active = t.assetId === assetId;
-                      return (
-                        <button
-                          key={t.assetId}
-                          type="button"
-                          role="radio"
-                          aria-checked={active}
-                          onClick={() => setAssetId(t.assetId)}
-                          className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold ${
-                            active
-                              ? "border-pine bg-pine text-white"
-                              : "border-line bg-white hover:border-pine"
-                          }`}
-                        >
-                          {t.symbol}
-                          <span className={active ? "text-white/75" : "text-muted"}>
-                            {" "}
-                            on {chainName(t.blockchain)}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-                {selected && (
-                  <p className="mt-3 text-sm text-muted">
-                    About {estimate(invoice.amountUsdc, selected)} {selected.symbol}.
-                    The exact amount is confirmed in the next step.
-                  </p>
-                )}
-              </fieldset>
-
-              <label className="block">
-                <span className="text-sm font-semibold">
-                  {selected
-                    ? `Your ${chainName(selected.blockchain)} wallet address`
-                    : "Your wallet address"}
-                </span>
-                <input
-                  className={INPUT}
-                  value={refundTo}
-                  onChange={(e) => setRefundTo(e.target.value.trim())}
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  required
-                />
-                <span className="mt-1 block text-sm text-muted">
-                  Only used to return your money if the payment fails.
-                </span>
-              </label>
-
-              {error && (
-                <p role="alert" className="rounded-lg bg-coral-soft px-3.5 py-2.5 text-sm text-coral">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={busy || !assetId}
-                className="w-full rounded-[10px] bg-pine px-5 py-3 font-semibold text-white hover:bg-pine-deep disabled:opacity-60"
-              >
-                {busy ? "Getting payment details..." : "Get payment details"}
-              </button>
-            </form>
-          ) : null}
+        <dl className="mt-5 space-y-3 text-[0.95rem]">
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Patient</dt>
+            <dd className="text-right font-semibold">{invoice.patientName}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Service</dt>
+            <dd className="text-right font-semibold">{invoice.description}</dd>
+          </div>
+        </dl>
+        <div className="mt-5 flex items-end justify-between gap-3 rounded-2xl bg-mint p-4">
+          <div>
+            <p className="text-sm text-muted">Amount due</p>
+            <p className="display mt-1 whitespace-nowrap text-[2.6rem] sm:text-5xl">
+              {invoice.amountUsdc}
+            </p>
+          </div>
+          <p className="display pb-1 text-xl text-muted">USDC</p>
         </div>
       </article>
+
+      {showQuote ? (
+        <QuoteView
+          invoice={invoice}
+          now={now}
+          demo={demo && quote.mock}
+          busy={busy}
+          error={error}
+          onSimulate={simulatePayment}
+        />
+      ) : canPay ? (
+        <form onSubmit={requestQuote} className="mt-6">
+          {(invoice.status === "failed" || invoice.status === "refunded") && (
+            <p role="alert" className="mb-4 rounded-xl bg-bad-bg px-4 py-3 text-sm text-bad-fg">
+              {invoice.status === "refunded"
+                ? "The last payment did not complete and was refunded to the paying wallet. You can try again."
+                : "The last payment failed. You can try again."}
+            </p>
+          )}
+          {notice && (
+            <p role="status" className="mb-4 rounded-xl bg-warn-bg px-4 py-3 text-sm text-warn-fg">
+              {notice}
+            </p>
+          )}
+
+          <fieldset>
+            <legend className="text-lg font-bold">Choose payment method</legend>
+            {tokenError ? (
+              <p role="alert" className="mt-2 text-sm text-bad-fg">{tokenError}</p>
+            ) : tokens.length === 0 ? (
+              <div className="mt-3 space-y-2.5" aria-label="Loading tokens">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="sheen h-16 rounded-2xl" />
+                ))}
+              </div>
+            ) : (
+              <div role="radiogroup" aria-label="Payment method" className="mt-3 space-y-2.5">
+                {tokens.map((t) => (
+                  <button
+                    key={t.assetId}
+                    type="button"
+                    role="radio"
+                    aria-checked={t.assetId === assetId}
+                    onClick={() => setAssetId(t.assetId)}
+                    className="option"
+                  >
+                    <TokenIcon symbol={t.symbol} />
+                    <span className="min-w-0">
+                      <span className="block font-bold">{t.symbol}</span>
+                      <span className="block text-sm text-muted">{chainName(t.blockchain)}</span>
+                    </span>
+                    <span className="ml-auto mr-2 hidden text-right text-sm text-muted min-[380px]:block">
+                      about {estimate(invoice.amountUsdc, t)}
+                    </span>
+                    <span className="radio !ml-0" aria-hidden />
+                  </button>
+                ))}
+              </div>
+            )}
+            {selected && (
+              <p className="mt-3 text-sm text-muted">
+                The exact amount is confirmed in the next step.
+              </p>
+            )}
+          </fieldset>
+
+          <label className="mt-6 block">
+            <span className="font-bold">
+              {selected
+                ? `Your ${chainName(selected.blockchain)} wallet address`
+                : "Your wallet address"}
+            </span>
+            <input
+              className="field font-mono !text-[15px]"
+              value={refundTo}
+              onChange={(e) => setRefundTo(e.target.value.trim())}
+              autoCapitalize="none"
+              spellCheck={false}
+              required
+            />
+            <span className="mt-1.5 block text-sm text-muted">
+              Only used to return your money if the payment fails.
+            </span>
+          </label>
+
+          {error && (
+            <p role="alert" className="mt-4 rounded-xl bg-bad-bg px-4 py-3 text-sm text-bad-fg">
+              {error}
+            </p>
+          )}
+
+          <div className="sticky bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-10 mt-6">
+            <button type="submit" disabled={busy || !assetId} className="btn btn-primary w-full">
+              {busy && <span className="spinner" aria-hidden />}
+              {busy ? "Getting payment details..." : "Get payment details"}
+            </button>
+          </div>
+        </form>
+      ) : null}
     </div>
+  );
+}
+
+function DemoNote() {
+  return (
+    <p className="pop mb-4 rounded-xl bg-warn-bg px-4 py-3 text-sm text-warn-fg">
+      Demo mode: no real money moves. Use the simulate button to see the full
+      flow.
+    </p>
   );
 }
 
@@ -329,12 +386,14 @@ function QuoteView({
   now,
   demo,
   busy,
+  error,
   onSimulate,
 }: {
   invoice: Invoice;
   now: number;
   demo: boolean;
   busy: boolean;
+  error: string;
   onSimulate: () => void;
 }) {
   const quote = invoice.quote!;
@@ -343,114 +402,176 @@ function QuoteView({
   const sent = Boolean(quote.simulatedDepositAt);
 
   return (
-    <div className="space-y-6">
+    <section className="pop mt-6">
       <Progress status={invoice.status} />
 
-      {processing ? (
-        <p className="text-muted">
-          Your payment arrived. It is being converted to USDC and sent to{" "}
-          {invoice.clinicName}. This usually takes a minute or two.
-        </p>
-      ) : (
-        <>
-          <div>
-            <p className="text-sm text-muted">
-              Send exactly this amount on {chain}
-            </p>
-            <div className="mt-1.5 flex items-center justify-between gap-3">
-              <p className="font-display text-2xl font-extrabold">
-                {quote.amountInFormatted} {quote.originSymbol}
-              </p>
-              <CopyButton value={quote.amountInFormatted} />
-            </div>
-          </div>
-
-          <div>
-            <p className="text-sm text-muted">To this deposit address</p>
-            <div className="mt-1.5 flex items-center gap-3">
-              <code className="min-w-0 flex-1 break-all rounded-lg bg-paper px-3 py-2.5 text-sm">
-                {quote.depositAddress}
-              </code>
-              <CopyButton value={quote.depositAddress} />
-            </div>
-          </div>
-
-          <p className="text-sm text-muted">
-            Send from {chain} only, and send this exact token and amount. These
-            details are valid for{" "}
-            <span className="font-semibold text-ink">
-              {countdown(quote.deadline, now)}
+      <div className="card mt-4 space-y-5 p-5 sm:p-6">
+        {processing ? (
+          <div className="text-center">
+            <span className="dot-live mx-auto grid size-14 place-items-center rounded-full bg-info-bg text-info-fg">
+              <span className="spinner" aria-hidden />
             </span>
-            .
-          </p>
+            <h2 className="display mt-4 text-2xl">Payment received</h2>
+            <p className="mt-1.5 text-muted">
+              It is being converted to USDC and sent to {invoice.clinicName}.
+              This usually takes a minute or two.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div>
+              <p className="text-sm text-muted">Send exactly this amount on {chain}</p>
+              <div className="mt-1.5 flex items-center justify-between gap-3">
+                <p className="display text-3xl">
+                  {quote.amountInFormatted} {quote.originSymbol}
+                </p>
+                <CopyButton value={quote.amountInFormatted} />
+              </div>
+            </div>
 
-          {demo && !sent && (
-            <button
-              type="button"
-              onClick={onSimulate}
-              disabled={busy}
-              className="w-full rounded-[10px] border border-pine px-5 py-3 font-semibold text-pine hover:bg-mint disabled:opacity-60"
-            >
-              Simulate the payment
-            </button>
-          )}
-        </>
-      )}
-    </div>
+            <div>
+              <p className="text-sm text-muted">To this deposit address</p>
+              <div className="mt-1.5 flex items-center gap-2.5">
+                <code className="inset min-w-0 flex-1 break-all px-3 py-3 text-sm">
+                  {quote.depositAddress}
+                </code>
+                <CopyButton value={quote.depositAddress} />
+              </div>
+            </div>
+
+            <p className="rounded-xl bg-warn-bg px-4 py-3 text-sm text-warn-fg">
+              Send from {chain} only, and send this exact token and amount.
+              These details are valid for{" "}
+              <strong>{countdown(quote.deadline, now)}</strong>.
+            </p>
+
+            {error && (
+              <p role="alert" className="rounded-xl bg-bad-bg px-4 py-3 text-sm text-bad-fg">
+                {error}
+              </p>
+            )}
+
+            {demo && !sent && (
+              <button type="button" onClick={onSimulate} disabled={busy} className="btn btn-primary w-full">
+                {busy && <span className="spinner" aria-hidden />}
+                Simulate the payment
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </section>
   );
 }
 
 function Progress({ status }: { status: Invoice["status"] }) {
   const step = status === "processing" ? 1 : 0;
-  const labels = ["Waiting for your payment", "Converting", "Clinic paid"];
+  const labels = ["Send payment", "Converting", "Clinic paid"];
   return (
-    <ol className="flex items-center gap-2 text-sm" aria-label="Payment progress">
+    <ol className="grid grid-cols-3 gap-2" aria-label="Payment progress">
       {labels.map((label, i) => (
         <li
           key={label}
           aria-current={i === step ? "step" : undefined}
-          className={`flex items-center gap-2 ${i === step ? "font-semibold text-ink" : "text-muted"}`}
+          className="flex flex-col items-center gap-1.5 text-center text-xs font-semibold sm:text-sm"
         >
           <span
-            aria-hidden
-            className={`size-2.5 rounded-full ${
-              i < step ? "bg-pine" : i === step ? "animate-pulse bg-amber" : "bg-line"
+            className={`grid size-8 place-items-center rounded-full text-sm font-bold ${
+              i < step
+                ? "bg-primary text-white"
+                : i === step
+                  ? "bg-info-bg text-info-fg dot-live"
+                  : "bg-surface2 text-muted"
             }`}
-          />
-          {label}
-          {i < labels.length - 1 && <span aria-hidden className="mx-1 h-px w-4 bg-line" />}
+          >
+            {i < step ? <Icon name="check" className="size-4" /> : i + 1}
+          </span>
+          <span className={i === step ? "text-fg" : "text-muted"}>{label}</span>
         </li>
       ))}
     </ol>
   );
 }
 
+const CONFETTI = [
+  ["#1fc88b", -150, -90, 200, 0],
+  ["#3fa9ff", -110, -140, -160, 40],
+  ["#f5b041", -60, -110, 260, 20],
+  ["#1fc88b", -20, -160, -220, 70],
+  ["#3fa9ff", 30, -120, 180, 10],
+  ["#f5b041", 80, -150, -140, 60],
+  ["#1fc88b", 120, -100, 240, 30],
+  ["#3fa9ff", 160, -70, -200, 0],
+  ["#f5b041", -130, -30, 150, 90],
+  ["#1fc88b", 140, -20, -170, 50],
+] as const;
+
 function PaidView({ invoice }: { invoice: Invoice }) {
   const quote = invoice.quote;
+  const ref = `CR-${invoice.id.slice(-8).toUpperCase()}`;
+  const [pageUrl, setPageUrl] = useState("");
+  useEffect(() => setPageUrl(window.location.href), []);
+
   return (
-    <div className="flex items-center justify-between gap-6">
-      <div className="space-y-1 text-sm">
-        <p className="font-semibold">
-          {invoice.clinicName} received {invoice.amountUsdc} USDC
-        </p>
-        <p className="text-muted">
-          Sent to <span className="font-mono">{invoice.clinicNearAccount}</span> on NEAR
-        </p>
-        {quote && (
-          <p className="text-muted">
-            Paid with {quote.amountInFormatted} {quote.originSymbol} on{" "}
-            {chainName(quote.originChain)}
-          </p>
-        )}
-        {invoice.paidAt && (
-          <p className="text-muted">
-            {new Date(invoice.paidAt).toLocaleString()}
-          </p>
-        )}
+    <div className="card pop relative overflow-hidden p-6 text-center sm:p-8">
+      <div className="confetti" aria-hidden>
+        {CONFETTI.map(([c, x, y, r, dl], i) => (
+          <i
+            key={i}
+            style={
+              {
+                "--c": c,
+                "--x": `${x}px`,
+                "--y": `${y}px`,
+                "--r": `${r}deg`,
+                "--dl": `${dl + 250}ms`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
       </div>
-      <span className="stamp shrink-0" aria-label="Paid">
-        PAID
+      <span className="success-ring mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#07694a] to-[#0d8559] text-white shadow-[0_14px_30px_-10px_rgba(20,166,115,0.8)]">
+        <Icon name="check" className="size-10" />
       </span>
+      <h1 className="display mt-5 text-3xl">Payment successful</h1>
+      <p className="mt-2 text-muted">
+        {invoice.clinicName} received{" "}
+        <strong className="text-fg">{invoice.amountUsdc} USDC</strong>.
+      </p>
+
+      <dl className="inset mt-6 divide-y divide-line text-left text-[0.95rem]">
+        <Row label="Patient">{invoice.patientName}</Row>
+        {quote && (
+          <Row label="Paid with">
+            {quote.amountInFormatted} {quote.originSymbol} on {chainName(quote.originChain)}
+          </Row>
+        )}
+        <Row label="Settled to">
+          <span className="font-mono text-sm">{invoice.clinicNearAccount}</span> on NEAR
+        </Row>
+        {invoice.paidAt && (
+          <Row label="Date">{new Date(invoice.paidAt).toLocaleString()}</Row>
+        )}
+        <Row label="Invoice ref">
+          <span className="font-mono text-sm">{ref}</span>
+        </Row>
+      </dl>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <CopyButton value={pageUrl} label="Copy receipt link" className="!min-h-[52px] !w-full !text-base" />
+        <a href="/" className="btn btn-soft">
+          Back to home
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-4 px-4 py-3">
+      <dt className="shrink-0 text-muted">{label}</dt>
+      <dd className="min-w-0 break-words text-right font-semibold">{children}</dd>
     </div>
   );
 }

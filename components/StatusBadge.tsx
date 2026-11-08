@@ -2,18 +2,18 @@ import type { InvoiceStatus } from "@/lib/types";
 
 const LABELS: Record<InvoiceStatus, string> = {
   awaiting_payment: "Waiting for payment",
-  processing: "Payment received, converting",
+  processing: "Converting",
   paid: "Paid",
-  refunded: "Refunded to payer",
-  failed: "Payment failed",
+  refunded: "Refunded",
+  failed: "Failed",
 };
 
 const STYLES: Record<InvoiceStatus, string> = {
-  awaiting_payment: "bg-amber-soft text-amber",
-  processing: "bg-amber-soft text-amber",
-  paid: "bg-mint text-pine-deep",
-  refunded: "bg-coral-soft text-coral",
-  failed: "bg-coral-soft text-coral",
+  awaiting_payment: "bg-warn-bg text-warn-fg",
+  processing: "bg-info-bg text-info-fg",
+  paid: "bg-ok-bg text-ok-fg",
+  refunded: "bg-bad-bg text-bad-fg",
+  failed: "bg-bad-bg text-bad-fg",
 };
 
 export function statusLabel(status: InvoiceStatus): string {
@@ -22,12 +22,10 @@ export function statusLabel(status: InvoiceStatus): string {
 
 export function StatusBadge({ status }: { status: InvoiceStatus }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${STYLES[status]}`}
-    >
+    <span className={`pill ${STYLES[status]}`}>
       <span
         aria-hidden
-        className={`size-1.5 rounded-full bg-current ${status === "processing" ? "animate-pulse" : ""}`}
+        className={`size-1.5 rounded-full bg-current ${status === "processing" ? "dot-live" : ""}`}
       />
       {LABELS[status]}
     </span>

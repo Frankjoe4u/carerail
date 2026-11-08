@@ -83,7 +83,16 @@ const DEMO_TOKENS: PayToken[] = [
 ];
 
 const OFFERED_SYMBOLS = new Set(["USDC", "USDT", "ETH", "BTC", "SOL", "NEAR", "wNEAR"]);
-const OFFERED_CHAINS = new Set(["eth", "base", "arb", "sol", "near", "btc"]);
+// Chains verified end to end with real quotes. Solana is untested, and paying from the
+// Bitcoin chain needs an invoice of roughly 6.25 USDC or more, so both are left out.
+const OFFERED_CHAINS = new Set(["eth", "base", "arb", "near"]);
+
+const SYMBOL_RANK = ["USDC", "USDT", "ETH", "wNEAR", "NEAR", "BTC", "SOL"];
+const CHAIN_RANK = ["base", "eth", "arb", "near", "sol", "btc"];
+const rank = (list: string[], v: string) => {
+  const i = list.indexOf(v);
+  return i === -1 ? list.length : i;
+};
 
 function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -107,6 +116,7 @@ async function callApi<T>(path: string, init?: RequestInit): Promise<T> {
     /* non-JSON body, handled below */
   }
   if (!res.ok) {
+    console.error("1Click error", res.status, path, text);
     const message =
       (body as { message?: string } | null)?.message ?? text.slice(0, 200);
     throw new Error(`1Click API ${res.status}: ${message || res.statusText}`);
@@ -179,8 +189,8 @@ export async function getPayTokens(): Promise<PayToken[]> {
     }))
     .sort(
       (a, b) =>
-        a.symbol.localeCompare(b.symbol) ||
-        a.blockchain.localeCompare(b.blockchain),
+        rank(SYMBOL_RANK, a.symbol) - rank(SYMBOL_RANK, b.symbol) ||
+        rank(CHAIN_RANK, a.blockchain) - rank(CHAIN_RANK, b.blockchain),
     );
 }
 

@@ -51,14 +51,20 @@ Bad input is rejected with a message under the field, for example a NEAR account
 
 There is no testnet for NEAR Intents, so live mode uses mainnet. Use small amounts.
 
-1. Set `DEMO_MODE=false` in `.env.local`. Optionally set `ONE_CLICK_JWT` (from https://partners.near-intents.org) to use the authenticated fee schedule.
-2. Check the integration without moving money. This requests a **dry** quote (`dry: true`):
+1. Set `DEMO_MODE=false` in `.env.local`. Optionally set `ONE_CLICK_JWT` (a Distribution Channel key from https://partners.near-intents.org) to use your own API key.
+2. Check the integration without moving money. This asks 1Click for quotes and never sends funds. Replace both values with your own EVM wallet address and a NEAR account that exists:
 
    ```bash
-   npm run check:intents -- <your-base-wallet-address> <clinic-near-account>
+   node --env-file=.env.local scripts/check-intents.mjs 0xYourEvmWalletAddress yourname.near --all
    ```
 
-3. Run `npm run dev`, create an invoice with a real NEAR account, open the payer link, request payment details, and send the exact amount to the deposit address from your wallet.
+   Each line shows whether a dry quote and a real quote (which reserves a deposit address) work for one token.
+3. Run `npm run dev`, create an invoice, open the payer link, request payment details, and send the exact amount to the deposit address from your wallet.
+
+In live mode:
+- The clinic's NEAR account must exist. The app checks it when the invoice is created and rejects a misspelled account. The check uses `https://rpc.mainnet.near.org` by default (set `NEAR_RPC_URL` to change it) and never blocks invoice creation if that RPC is unreachable.
+- Payers can pay from Ethereum, Base, Arbitrum and NEAR, which were verified with real quotes. Solana is not offered because it is untested, and the Bitcoin chain is not offered because it needs a bill of roughly 6.25 USDC or more.
+- The refund address must be valid for the chain the payer chose, an `0x...` address for Ethereum, Base and Arbitrum, or a NEAR account for NEAR.
 
 ## Storage
 
@@ -82,3 +88,7 @@ Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intent
 ## License
 
 MIT
+
+## Design
+
+Built from the supplied template: deep emerald on glassy surfaces, dark mode by default with a light toggle (saved in the browser). Clinics get a sidebar on desktop and a bottom bar on phones (Invoices, New invoice, Home). Payers get a single focused page: bill summary, payment method, payment details, success. Animations respect `prefers-reduced-motion`.

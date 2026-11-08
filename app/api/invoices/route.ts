@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { isDemo } from "@/lib/intents";
 import { newInvoiceId, refreshInvoice } from "@/lib/invoices";
+import { nearAccountStatus } from "@/lib/near";
 import { listInvoices, saveInvoice } from "@/lib/store";
 import type { Invoice } from "@/lib/types";
 import {
@@ -51,6 +53,15 @@ export async function POST(request: Request) {
   if (description.length < 3) fields.description = "Describe what the bill is for.";
   if (!isValidUsdcAmount(amountUsdc)) {
     fields.amountUsdc = "Enter an amount in USDC, up to 2 decimals.";
+  }
+  // Live mode: a misspelled account has a valid format but does not exist, and the
+  // payout would fail. Only block when NEAR confirms the account is missing.
+  if (!fields.clinicNearAccount && !isDemo()) {
+    const status = await nearAccountStatus(clinicNearAccount);
+    if (status === "missing") {
+      fields.clinicNearAccount =
+        "This NEAR account does not exist. Check the spelling.";
+    }
   }
   if (Object.keys(fields).length > 0) {
     return NextResponse.json(

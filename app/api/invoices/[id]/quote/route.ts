@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
-import { createQuote, getPayTokens } from "@/lib/intents";
+import { friendlyQuoteError } from "@/lib/errors";
+import { createQuote, getPayTokens, isDemo } from "@/lib/intents";
 import { loadAndRefresh } from "@/lib/invoices";
 import { saveInvoice } from "@/lib/store";
-import { clean, isValidRefundAddress } from "@/lib/validate";
+import {
+  clean,
+  isValidEvmAddress,
+  isValidNearAccount,
+  isValidRefundAddress,
+} from "@/lib/validate";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +52,27 @@ export async function POST(
       return NextResponse.json({ error: "That token is not supported." }, { status: 400 });
     }
 
-    const quote = await createQuote({ invoice, origin, refundTo });
+    if (!isDemo()) {
+      const chain = origin.blockchain;
+      if (["eth", "base", "arb"].includes(chain) && !isValidEvmAddress(refundTo)) {
+        return NextResponse.json(
+          { error: "Enter a valid wallet address that starts with 0x and is 42 characters long." },
+          { status: 400 },
+        );
+      }
+      if (chain === "near" && !isValidNearAccount(refundTo.toLowerCase())) {
+        return NextResponse.json(
+          { error: "Enter a valid NEAR account, for example yourname.near." },
+          { status: 400 },
+        );
+      }
+    }
+
+    const quote = await createQuote({
+      invoice,
+      origin,
+      refundTo: origin.blockchain === "near" ? refundTo.toLowerCase() : refundTo,
+    });
     const next = {
       ...invoice,
       status: "awaiting_payment" as const,
@@ -57,7 +83,7 @@ export async function POST(
     return NextResponse.json({ invoice: next });
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Could not create a payment quote." },
+      { error: friendlyQuoteError(err instanceof Error ? err.message : "") },
       { status: 502 },
     );
   }
