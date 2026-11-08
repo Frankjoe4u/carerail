@@ -31,6 +31,13 @@ const CHECKS = [
   "One place to see every invoice and its status",
 ];
 
+const JOURNEY = [
+  { icon: "wallet", title: "Payer's wallet", sub: "Pays from the chain they use", chips: ["Ethereum", "Base", "Arbitrum", "NEAR"] },
+  { icon: "refresh", title: "NEAR Intents", sub: "Swaps and routes the payment", chips: null },
+  { icon: "checkcircle", title: "USDC on NEAR", sub: "The exact invoice amount", chips: null },
+  { icon: "building", title: "The clinic", sub: "Paid in full, invoice marked Paid", chips: null },
+];
+
 const TOKENS = ["NEAR", "USDC", "USDT", "ETH", "ARB"];
 
 const FAQS = [
@@ -200,12 +207,49 @@ export default function Home() {
                 height={910}
                 priority
                 sizes="(min-width: 1024px) 520px, 100vw"
-                unoptimized className="absolute inset-0 size-full object-cover"
+                className="absolute inset-0 size-full object-cover"
               />
               <PayCard className="absolute bottom-0 right-0 w-[56%] sm:w-[48%]" />
             </div>
             <InvoiceCard className="mt-4 lg:absolute lg:-left-6 lg:top-6 lg:mt-0 lg:w-56" />
           </div>
+        </div>
+      </section>
+
+      {/* Transaction journey */}
+      <section aria-label="How a payment travels" className="mt-6">
+        <div className="card px-4 py-5 sm:px-6">
+          <p className="text-center text-sm font-bold text-muted">How one payment travels</p>
+          <ol className="mt-4 grid items-stretch gap-2 md:grid-cols-[1.1fr_auto_1fr_auto_1fr_auto_1fr]">
+            {JOURNEY.map((j, i) => (
+              <li key={j.title} className="contents">
+                <div className="inset flex flex-col items-center justify-center px-3 py-4 text-center">
+                  <span className="grid size-11 place-items-center rounded-full bg-mint text-mintfg">
+                    <Icon name={j.icon} className="size-5" />
+                  </span>
+                  <p className="mt-2 font-bold leading-tight">{j.title}</p>
+                  <p className="mt-0.5 text-xs text-muted">{j.sub}</p>
+                  {j.chips && (
+                    <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                      {j.chips.map((c) => (
+                        <span key={c} className="rounded-full border border-line px-2 py-0.5 text-[11px] font-bold text-muted">{c}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {i < JOURNEY.length - 1 && (
+                  <span aria-hidden className="flex items-center justify-center text-primary">
+                    <span className="hidden items-center gap-1 md:flex">
+                      <span className="size-1.5 animate-pulse rounded-full bg-primary/40" />
+                      <span className="size-1.5 animate-pulse rounded-full bg-primary/70 [animation-delay:200ms]" />
+                      <Icon name="arrow" className="size-5" />
+                    </span>
+                    <Icon name="chevron" className="size-5 rotate-90 md:hidden" />
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
@@ -292,7 +336,7 @@ export default function Home() {
                 width={735}
                 height={594}
                 sizes="(min-width: 1024px) 520px, 100vw"
-                unoptimized className="absolute inset-0 size-full object-cover"
+                className="absolute inset-0 size-full object-cover"
               />
             </div>
             <DashboardCard className="mt-4 lg:absolute lg:-bottom-8 lg:-left-12 lg:mt-0 lg:w-[22rem]" />
@@ -343,6 +387,3 @@ export default function Home() {
     </>
   );
 }
-
-
-
