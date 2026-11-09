@@ -15,7 +15,7 @@ People regularly pay medical bills for relatives in another country, for example
 3. NEAR Intents swaps the payer's tokens across chains and delivers the exact invoice amount as USDC on NEAR to the clinic's NEAR account.
 4. The invoice updates from "Waiting for payment" to "Payment received, converting" to "Paid".
 
-If a payment fails, 1Click refunds the payer's wallet and the invoice shows "Refunded to payer" so the payer can try again.
+If a payment fails, 1Click refunds the payer's wallet and the invoice shows "Refunded" so the payer can try again.
 
 ## How NEAR is used
 
@@ -38,11 +38,11 @@ npm run dev
 
 | Do this | You should see |
 | --- | --- |
-| Open http://localhost:3000 | The landing page with a sample bill stamped PAID. |
-| Click **Create an invoice**, then fill in: clinic `Greenfield Medical Centre`, NEAR account `greenfield.near`, patient `Ngozi A.`, bill `Antenatal scan`, amount `180`, and press **Create invoice** | An "Invoice created" box with a payer link. The invoice appears in the list as **Waiting for payment**. |
+| Open http://localhost:3000 | The landing page: a sample paid invoice and "Pay with crypto" card, the journey from payer wallet through NEAR Intents to the clinic, and the three steps. Dark mode is the default; use the sun/moon button for light. |
+| Click **Get started** (or **New invoice**). Step 1: patient `Ngozi A.`, bill `Antenatal scan`, amount `180`, then **Continue**. Step 2: clinic `Greenfield Medical Centre`, NEAR account `greenfield.near`, then **Create invoice** | An "Invoice created" screen with a payer link. The invoice appears in the list as **Waiting for payment**. |
 | Click **Open the payer view** | The bill: 180.00 USDC, with a token picker. |
-| Pick **ETH on Ethereum**, enter any wallet address (for example `0x1234567890abcdef1234567890abcdef12345678`), press **Get payment details** | An exact amount (about `0.092769 ETH`), a deposit address, and a 30 minute countdown. |
-| Press **Simulate the payment** | The progress moves to **Converting**, then within about 8 seconds the bill shows a **PAID** stamp and the clinic account that received the USDC. |
+| Pick **ETH on Ethereum**, enter any wallet address as the refund address (for example `0x1234567890abcdef1234567890abcdef12345678`), press **Get payment details** | An exact amount (about `0.092769 ETH`), a deposit address, and a 30 minute countdown. |
+| Press **Simulate the payment** | The progress moves to **Converting**, then within about 8 seconds the page shows **Payment successful** with the clinic account that received the USDC. |
 | Go back to `/clinic` | The invoice is listed as **Paid**. |
 
 Bad input is rejected with a message under the field, for example a NEAR account like `Bad Account!` or an amount of `-5`.
@@ -70,6 +70,20 @@ In live mode:
 
 Invoices are stored in a local JSON file (`.data/invoices.json`) with zero setup. To use Supabase instead, run `supabase/schema.sql` and set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. If the filesystem is read-only (serverless hosting), the app falls back to in-memory storage.
 
+## Deploying on Vercel
+
+Vercel functions do not share memory or disk, so invoices need a database or the payer link shows "Invoice not found". Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (run `supabase/schema.sql` first) for Production and Preview, then redeploy. Open `/api/health` to confirm: it reports `demoMode` and whether storage is `supabase`, without exposing any secret.
+
+## Pages
+
+| Path | Who | What |
+| --- | --- | --- |
+| `/` | Everyone | Landing page |
+| `/pay` | Payer | Paste an invoice link to open the bill |
+| `/pay/[id]` | Payer | Bill, token choice, quote and deposit address, progress, receipt |
+| `/clinic` | Clinic | Invoice list with status, search and filters |
+| `/clinic/new` | Clinic | Two-step invoice form and shareable link |
+
 ## Scope and known limits
 
 - This is a prototype. The clinic dashboard at `/clinic` is not behind a login, so it lists every invoice on the deployment. Clinic sign-in is the first thing to add for real use.
@@ -84,6 +98,8 @@ Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intent
 
 - All code in this repository was written during the hackathon window. There is no pre-hackathon baseline.
 - Written with AI assistance (Claude Code). No templates or boilerplate beyond the standard Next.js setup and the npm packages in `package.json`.
+- The two photos on the landing page (`public/images/hero.jpg`, `public/images/provider.jpg`) come from the author's own design mockup. The invoice, payment and dashboard figures on the landing page are sample data and are labelled as examples.
+- In demo mode no real funds move. The payment shown in the demo video is simulated.
 
 ## License
 
@@ -91,4 +107,4 @@ MIT
 
 ## Design
 
-Built from the supplied template: deep emerald on glassy surfaces, dark mode by default with a light toggle (saved in the browser). Clinics get a sidebar on desktop and a bottom bar on phones (Invoices, New invoice, Home). Payers get a single focused page: bill summary, payment method, payment details, success. Animations respect `prefers-reduced-motion`.
+Navy and teal, dark mode by default with a light toggle (saved in the browser). The landing page follows the author's mockup: hero with a payment preview, a payment-journey strip, three steps and a clinic dashboard preview. Clinics get a sidebar on desktop and a bottom bar on phones (Invoices, New invoice, Home). Payers get a single focused page: bill summary, payment method, payment details, success. Animations respect `prefers-reduced-motion`.
