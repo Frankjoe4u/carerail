@@ -99,6 +99,10 @@ Vercel functions do not share memory or disk, so invoices need a database or the
 
 Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intents 1Click API, `qrcode` for the deposit QR.
 
+## Design
+
+Navy and teal, dark mode by default with a light toggle (saved in the browser). The landing page follows the author's mockup: hero with a payment preview, a payment-journey strip, three steps and a clinic dashboard preview. Clinics get a sidebar on desktop and a bottom bar on phones (Invoices, New invoice, Home). Payers get a single focused page: bill summary, payment method, payment details, success. Animations respect `prefers-reduced-motion`.
+
 ## Disclosures
 
 - All code in this repository was written during the hackathon window. There is no pre-hackathon baseline.
@@ -109,7 +113,3 @@ Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intent
 ## License
 
 MIT
-
-## Design
-
-Navy and teal, dark mode by default with a light toggle (saved in the browser). The landing page follows the author's mockup: hero with a payment preview, a payment-journey strip, three steps and a clinic dashboard preview. Clinics get a sidebar on desktop and a bottom bar on phones (Invoices, New invoice, Home). Payers get a single focused page: bill summary, payment method, payment details, success. Animations respect `prefers-reduced-motion`.
