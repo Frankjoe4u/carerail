@@ -47,6 +47,8 @@ export interface Invoice {
   intentsStatus?: string;
   createdAt: string;
   paidAt?: string;
+  /** The USDC transfer to the clinic on NEAR, when 1Click reports it (live mode) */
+  settlement?: { txHash: string; explorerUrl: string };
   quote?: PaymentQuote;
 }
 

@@ -1,4 +1,4 @@
-import { getIntentsStatus, mapStatus } from "./intents";
+import { getIntentsState, mapStatus } from "./intents";
 import { getInvoice, saveInvoice } from "./store";
 import type { Invoice } from "./types";
 
@@ -17,9 +17,11 @@ export async function refreshInvoice(invoice: Invoice): Promise<Invoice> {
     invoice.status === "failed";
   if (!invoice.quote || settled) return invoice;
 
-  const raw = await getIntentsStatus(invoice.quote);
+  const state = await getIntentsState(invoice.quote);
+  const raw = state.status;
   const status = mapStatus(raw);
   const next: Invoice = { ...invoice, intentsStatus: raw, status };
+  if (state.settlement) next.settlement = state.settlement;
 
   if (status === "paid") next.paidAt = new Date().toISOString();
 

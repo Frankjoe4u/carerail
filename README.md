@@ -11,9 +11,9 @@ People regularly pay medical bills for relatives in another country, for example
 ## What it does
 
 1. A clinic creates an invoice (patient, description, amount in USDC) and shares the link.
-2. The payer opens the link, picks a token and chain, and gets an exact amount and a deposit address.
+2. The payer opens the link, picks a token and chain, and gets an exact amount and a deposit address, as text and as a QR code to scan with a wallet app.
 3. NEAR Intents swaps the payer's tokens across chains and delivers the exact invoice amount as USDC on NEAR to the clinic's NEAR account.
-4. The invoice updates from "Waiting for payment" to "Payment received, converting" to "Paid".
+4. The invoice updates from "Waiting for payment" to "Payment received, converting" to "Paid". In live mode the paid screen links to the USDC transfer on the NEAR explorer.
 
 If a payment fails, 1Click refunds the payer's wallet and the invoice shows "Refunded" so the payer can try again.
 
@@ -24,7 +24,7 @@ If a payment fails, 1Click refunds the payer's wallet and the invoice shows "Ref
 | **NEAR Intents, 1Click API** | Cross-chain settlement. A quote with `swapType: EXACT_OUTPUT` fixes what the clinic receives, so the payer's cost adjusts to the invoice. `GET /v0/status` drives the invoice state. |
 | **USDC on NEAR** | The payout asset. The clinic is paid in a stable currency on a NEAR account it controls. |
 
-Code: `lib/intents.ts` (quotes, status, token list), `lib/invoices.ts` (status refresh).
+Code: `lib/intents.ts` (quotes, status, token list, settlement transaction), `lib/invoices.ts` (status refresh).
 
 ## Try it in 2 minutes (demo mode, no wallet or funds)
 
@@ -41,9 +41,11 @@ npm run dev
 | Open http://localhost:3000 | The landing page: a sample paid invoice and "Pay with crypto" card, the journey from payer wallet through NEAR Intents to the clinic, and the three steps. Dark mode is the default; use the sun/moon button for light. |
 | Click **Get started** (or **New invoice**). Step 1: patient `Ngozi A.`, bill `Antenatal scan`, amount `180`, then **Continue**. Step 2: clinic `Greenfield Medical Centre`, NEAR account `greenfield.near`, then **Create invoice** | An "Invoice created" screen with a payer link. The invoice appears in the list as **Waiting for payment**. |
 | Click **Open the payer view** | The bill: 180.00 USDC, with a token picker. |
-| Pick **ETH on Ethereum**, enter any wallet address as the refund address (for example `0x1234567890abcdef1234567890abcdef12345678`), press **Get payment details** | An exact amount (about `0.092769 ETH`), a deposit address, and a 30 minute countdown. |
+| Pick **ETH on Ethereum**, enter any wallet address as the refund address (for example `0x1234567890abcdef1234567890abcdef12345678`), press **Get payment details** | An exact amount (about `0.092769 ETH`), a deposit address with a scannable QR code, and a 30 minute countdown. |
 | Press **Simulate the payment** | The progress moves to **Converting**, then within about 8 seconds the page shows **Payment successful** with the clinic account that received the USDC. |
 | Go back to `/clinic` | The invoice is listed as **Paid**. |
+
+Demo mode has no real transfer, so the paid screen shows no explorer link there.
 
 Bad input is rejected with a message under the field, for example a NEAR account like `Bad Account!` or an amount of `-5`.
 
@@ -59,9 +61,10 @@ There is no testnet for NEAR Intents, so live mode uses mainnet. Use small amoun
    ```
 
    Each line shows whether a dry quote and a real quote (which reserves a deposit address) work for one token.
-3. Run `npm run dev`, create an invoice, open the payer link, request payment details, and send the exact amount to the deposit address from your wallet.
+3. Run `npm run dev`, create an invoice, open the payer link, request payment details, and send the exact amount to the deposit address from your wallet (paste the address or scan the QR code).
 
 In live mode:
+- When the swap succeeds, the status response from 1Click includes the destination transaction (`swapDetails.destinationChainTxHashes`). The paid screen links to it on the NEAR explorer. If 1Click does not report a transaction, the screen links to the clinic account on the explorer instead. This link is built from the documented API response and has not yet been checked against a completed real payment.
 - The clinic's NEAR account must exist. The app checks it when the invoice is created and rejects a misspelled account. The check uses `https://rpc.mainnet.near.org` by default (set `NEAR_RPC_URL` to change it) and never blocks invoice creation if that RPC is unreachable.
 - Payers can pay from Ethereum, Base, Arbitrum and NEAR, which were verified with real quotes. Solana is not offered because it is untested, and the Bitcoin chain is not offered because it needs a bill of roughly 6.25 USDC or more.
 - The refund address must be valid for the chain the payer chose, an `0x...` address for Ethereum, Base and Arbitrum, or a NEAR account for NEAR.
@@ -92,7 +95,7 @@ Vercel functions do not share memory or disk, so invoices need a database or the
 
 ## Stack
 
-Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intents 1Click API.
+Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intents 1Click API, `qrcode` for the deposit QR.
 
 ## Disclosures
 

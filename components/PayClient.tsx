@@ -1,5 +1,6 @@
 "use client";
 
+import { QrCode } from "./QrCode";
 import {
   useCallback,
   useEffect,
@@ -437,6 +438,15 @@ function QuoteView({
                 </code>
                 <CopyButton value={quote.depositAddress} />
               </div>
+              <div className="mt-4">
+                <QrCode
+                  value={quote.depositAddress}
+                  label={`QR code of the deposit address on ${chain}`}
+                />
+                <p className="mt-2 text-center text-xs text-muted">
+                  Or scan with your wallet app
+                </p>
+              </div>
             </div>
 
             <p className="rounded-xl bg-warn-bg px-4 py-3 text-sm text-warn-fg">
@@ -549,6 +559,34 @@ function PaidView({ invoice }: { invoice: Invoice }) {
         <Row label="Settled to">
           <span className="font-mono text-sm">{invoice.clinicNearAccount}</span> on NEAR
         </Row>
+        {invoice.settlement ? (
+          <Row label="Transaction">
+            <a
+              href={invoice.settlement.explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-primary underline-offset-2 hover:underline"
+            >
+              View on NEAR explorer
+              <Icon name="arrow" className="size-4 -rotate-45" />
+            </a>
+          </Row>
+        ) : (
+          quote &&
+          !quote.mock && (
+            <Row label="Explorer">
+              <a
+                href={`https://nearblocks.io/address/${encodeURIComponent(invoice.clinicNearAccount)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-primary underline-offset-2 hover:underline"
+              >
+                View clinic account
+                <Icon name="arrow" className="size-4 -rotate-45" />
+              </a>
+            </Row>
+          )
+        )}
         {invoice.paidAt && (
           <Row label="Date">{new Date(invoice.paidAt).toLocaleString()}</Row>
         )}

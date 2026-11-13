@@ -294,10 +294,34 @@ export async function getIntentsStatus(quote: PaymentQuote): Promise<string> {
     if (elapsed < 8_000) return "PROCESSING";
     return "SUCCESS";
   }
-  const res = await callApi<{ status?: string }>(
-    `/v0/status?depositAddress=${encodeURIComponent(quote.depositAddress)}`,
+  return (await getIntentsState(quote)).status;
+}
+
+export interface IntentsState {
+  status: string;
+  /** Transaction that delivered the USDC to the clinic, when reported */
+  settlement?: { txHash: string; explorerUrl: string };
+}
+
+/** Status plus, once settled, the destination transaction on NEAR. */
+export async function getIntentsState(quote: PaymentQuote): Promise<IntentsState> {
+  if (quote.mock) return { status: await getIntentsStatus(quote) };
+  const res = await callApi<{
+    status?: string;
+    swapDetails?: {
+      destinationChainTxHashes?: { hash?: string; explorerUrl?: string }[];
+    };
+  }>(`/v0/status?depositAddress=${encodeURIComponent(quote.depositAddress)}`);
+  const status = res.status ?? "PENDING_DEPOSIT";
+  const tx = res.swapDetails?.destinationChainTxHashes?.find(
+    (t) => typeof t?.hash === "string" && t.hash.length > 0,
   );
-  return res.status ?? "PENDING_DEPOSIT";
+  if (status !== "SUCCESS" || !tx?.hash) return { status };
+  const url =
+    typeof tx.explorerUrl === "string" && tx.explorerUrl.startsWith("https://")
+      ? tx.explorerUrl
+      : `https://nearblocks.io/txns/${encodeURIComponent(tx.hash)}`;
+  return { status, settlement: { txHash: tx.hash, explorerUrl: url } };
 }
 
 export function mapStatus(raw: string): InvoiceStatus {
