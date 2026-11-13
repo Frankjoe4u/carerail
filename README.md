@@ -28,12 +28,14 @@ Code: `lib/intents.ts` (quotes, status, token list, settlement transaction), `li
 
 ## Try it in 2 minutes (demo mode, no wallet or funds)
 
+This project uses **pnpm** (install it with `corepack enable` or `npm i -g pnpm`) and Node 20 or newer.
+
 Demo mode is the default. It runs the whole flow with a local simulator in place of the 1Click API, so nothing needs a wallet, a database or an account.
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local
-npm run dev
+pnpm dev
 ```
 
 | Do this | You should see |
@@ -45,7 +47,7 @@ npm run dev
 | Press **Simulate the payment** | The progress moves to **Converting**, then within about 8 seconds the page shows **Payment successful** with the clinic account that received the USDC. |
 | Go back to `/clinic` | The invoice is listed as **Paid**. |
 
-Demo mode has no real transfer, so the paid screen shows no explorer link there.
+Demo mode has no real transfer, so the paid screen shows no explorer link there, and the QR code holds a fake demo address that no wallet can pay.
 
 Bad input is rejected with a message under the field, for example a NEAR account like `Bad Account!` or an amount of `-5`.
 
@@ -61,7 +63,7 @@ There is no testnet for NEAR Intents, so live mode uses mainnet. Use small amoun
    ```
 
    Each line shows whether a dry quote and a real quote (which reserves a deposit address) work for one token.
-3. Run `npm run dev`, create an invoice, open the payer link, request payment details, and send the exact amount to the deposit address from your wallet (paste the address or scan the QR code).
+3. Run `pnpm dev`, create an invoice, open the payer link, request payment details, and send the exact amount to the deposit address from your wallet (paste the address or scan the QR code).
 
 In live mode:
 - When the swap succeeds, the status response from 1Click includes the destination transaction (`swapDetails.destinationChainTxHashes`). The paid screen links to it on the NEAR explorer. If 1Click does not report a transaction, the screen links to the clinic account on the explorer instead. This link is built from the documented API response and has not yet been checked against a completed real payment.
@@ -83,7 +85,7 @@ Vercel functions do not share memory or disk, so invoices need a database or the
 | --- | --- | --- |
 | `/` | Everyone | Landing page |
 | `/pay` | Payer | Paste an invoice link to open the bill |
-| `/pay/[id]` | Payer | Bill, token choice, quote and deposit address, progress, receipt |
+| `/pay/[id]` | Payer | Bill, token choice, quote with deposit address and QR code, progress, receipt |
 | `/clinic` | Clinic | Invoice list with status, search and filters |
 | `/clinic/new` | Clinic | Two-step invoice form and shareable link |
 
@@ -100,7 +102,7 @@ Next.js (App Router), TypeScript, Tailwind CSS, Supabase (optional), NEAR Intent
 ## Disclosures
 
 - All code in this repository was written during the hackathon window. There is no pre-hackathon baseline.
-- Written with AI assistance (Claude Code). No templates or boilerplate beyond the standard Next.js setup and the npm packages in `package.json`.
+- Written with AI assistance (Claude Code). No templates or boilerplate beyond the standard Next.js setup and the packages in `package.json`.
 - The two photos on the landing page (`public/images/hero.jpg`, `public/images/provider.jpg`) come from the author's own design mockup. The invoice, payment and dashboard figures on the landing page are sample data and are labelled as examples.
 - In demo mode no real funds move. The payment shown in the demo video is simulated.
 
